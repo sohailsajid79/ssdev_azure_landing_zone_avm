@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/Azure-Landing-Zones-Library/main/schemas/architecture_definition.json",
+  "name": "alz",
+  "management_groups": [
+    {
+      "id": "ssdev",
+      "display_name": "SS Dev Platform",
+      "archetypes": ["root"],
+      "parent_id": null,
+      "exists": false
+    }
+  ]
+}
