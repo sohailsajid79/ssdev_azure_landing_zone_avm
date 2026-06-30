@@ -1,0 +1,6 @@
+platform_sub_id    = "647b7767-ba25-46c1-a06d-dd9597593c3e"
+root_tenant_id     = "beb66dab-b4bc-4c6c-b79e-49d604eee3e8"
+landingzone_sub_id = ""
+management_sub_id  = ""
+github_org         = "sohailsajid79"
+github_repo        = "ssdev-azure-landing-zone-avm"
