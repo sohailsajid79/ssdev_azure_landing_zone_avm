@@ -24,6 +24,11 @@ variable "log_analytics_sku" {
   default = "PerGB2018"
 }
 
+variable "enable_sentinel" {
+  type    = bool
+  default = false
+}
+
 variable "log_retention_in_days" {
   type    = number
   default = 30
