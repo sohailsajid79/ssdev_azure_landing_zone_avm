@@ -24,7 +24,7 @@ resource "azurerm_storage_account" "str" {
   min_tls_version                 = "TLS1_2"
   https_traffic_only_enabled      = true
   allow_nested_items_to_be_public = false
-  public_network_access_enabled   = false
+  public_network_access_enabled   = true
 
   shared_access_key_enabled = true
 
@@ -46,16 +46,23 @@ resource "azurerm_storage_container" "str_container" {
   name                  = "tfstate"
   storage_account_id    = azurerm_storage_account.str.id
   container_access_type = "private"
+
 }
 
-resource "azurerm_role_assignment" "role_assign" {
+resource "azurerm_role_assignment" "role_assign_owner" {
   scope                = azurerm_storage_account.str.id
   role_definition_name = "Storage Blob Data Owner"
   principal_id         = data.azurerm_client_config.current.object_id
 }
 
-resource "azurerm_role_assignment" "role_assign_contributor" {
-  scope                = azurerm_storage_account.str.id
-  role_definition_name = "Storage Blob Data Contributor"
+# resource "azurerm_role_assignment" "role_assign_contributor" {
+#   scope                = azurerm_storage_account.str.id
+#   role_definition_name = "Storage Blob Data Contributor"
+#   principal_id         = data.azurerm_client_config.current.object_id
+# }
+
+resource "azurerm_role_assignment" "root_owner_parent_mgmt" {
+  scope                = "/providers/Microsoft.Management/managementGroups/${var.root_tenant_id}"
+  role_definition_name = "Owner"
   principal_id         = data.azurerm_client_config.current.object_id
 }
