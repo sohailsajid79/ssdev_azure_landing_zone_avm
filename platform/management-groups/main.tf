@@ -9,10 +9,16 @@ module "avm-ptn-alz" {
 
   enable_telemetry = var.enable_telemetry
 
-  # causing timeout error. disabling the setting for now.   
-  # management_group_hierarchy_settings = {
-  #   default_management_group_name = var.intermediate_root_id
-  # }
+  subscription_placement = {
+    platform = {
+      subscription_id       = var.subscription_id
+      management_group_name = "platform"
+    }
+  }
+
+  management_group_hierarchy_settings = {
+    default_management_group_name = "sandbox"
+  }
 
   policy_default_values = null
 }
