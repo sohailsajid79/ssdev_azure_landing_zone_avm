@@ -1,0 +1,9 @@
+.terraform/
+**/.terraform/*
+terraform.tfstate
+terraform.tfstate.*
+*.tfstate
+*.tfstate.*
+*.tfplan
+.terraform.lock.hcl
+.alzlib
