@@ -1,0 +1,6 @@
+billing_account_name     = "72719ca3-e205-5d0b-d724-f36c7f1c74b2:a4ac4281-c348-486f-a9e4-381d69e0ef41_2019-05-31"
+billing_profile_name     = "66VL-2QJD-BG7-PGB"
+invoice_section_name     = "A5DQ-WG2C-PJA-PGB"
+ci_principal_id          = "3f490f7e-b670-406a-83be-1b0b25431176" # enterprise app sp object id sp-ss-dev-alz-github-oidc
+platform_subscription_id = "647b7767-ba25-46c1-a06d-dd9597593c3e"
+location                 = "uksouth"
