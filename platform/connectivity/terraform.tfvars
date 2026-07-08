@@ -1,0 +1,1 @@
+connectivity_subscription_id = "4f6ba84c-31c8-4b22-b336-98a2a768209a"
