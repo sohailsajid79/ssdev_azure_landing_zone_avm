@@ -1,4 +1,4 @@
-variable "platform_sub_id" {
+variable "bootstrap_sub_id" {
   type = string
 }
 
@@ -6,12 +6,10 @@ variable "root_tenant_id" {
   type = string
 }
 
-variable "landingzone_sub_id" {
-  type = string
-}
-
-variable "management_sub_id" {
-  type = string
+variable "vended_subscription_ids" {
+  type        = map(string)
+  description = "Vended subscription IDs requiring pipeline SP access"
+  default     = {}
 }
 
 variable "prefix" {
