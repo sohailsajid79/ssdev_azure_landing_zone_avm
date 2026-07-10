@@ -1,0 +1,1 @@
+management_subscription_id = "4b967947-aa67-4485-a8a4-7e878d231acc"
