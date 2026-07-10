@@ -22,12 +22,5 @@ module "subscriptions" {
   subscription_management_group_association_enabled = true
   subscription_management_group_id                  = each.value.management_group_id
 
-  role_assignment_enabled = true
-  role_assignments = {
-    ci_contributor = {
-      principal_id   = var.ci_principal_id
-      definition     = "Contributor"
-      relative_scope = ""
-    }
-  }
+  role_assignment_enabled = false
 }

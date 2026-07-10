@@ -19,11 +19,6 @@ variable "invoice_section_name" {
   type = string
 }
 
-variable "ci_principal_id" {
-  type        = string
-  description = "Object ID of the GitHub OIDC service principal."
-}
-
 variable "tags" {
   type = map(string)
   default = {
