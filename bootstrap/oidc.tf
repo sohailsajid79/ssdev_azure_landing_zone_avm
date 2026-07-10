@@ -41,24 +41,36 @@ resource "azuread_application_federated_identity_credential" "pull_request" {
 }
 
 locals {
-  subscription_ids = distinct(compact([
-    var.platform_sub_id,
-    var.landingzone_sub_id,
-    var.management_sub_id,
-  ]))
+  pipeline_subscription_ids = merge(
+    { bootstrap = var.bootstrap_sub_id },
+    var.vended_subscription_ids,
+  )
 }
 
 resource "azurerm_role_assignment" "github_subscriptions" {
-  for_each = toset(local.subscription_ids)
+  for_each = local.pipeline_subscription_ids
 
   scope                = "/subscriptions/${each.value}"
   role_definition_name = "Owner"
   principal_id         = azuread_service_principal.sp.object_id
 }
 
+# moved {
+#   from = azurerm_role_assignment.github_subscriptions["647b7767-ba25-46c1-a06d-dd9597593c3e"]
+#   to   = azurerm_role_assignment.github_subscriptions["bootstrap"]
+# }
+
 resource "azurerm_role_assignment" "github_tenant_root" {
   count                = var.grant_tenant_root_owner ? 1 : 0
   scope                = "/providers/Microsoft.Management/managementGroups/${var.root_tenant_id}"
   role_definition_name = "Owner"
+  principal_id         = azuread_service_principal.sp.object_id
+}
+
+# Pipeline SP needs data-plane access to state blobs; Owner is control-plane
+# only and won't suffice once the backend moves to use_azuread_auth.
+resource "azurerm_role_assignment" "github_state_blob" {
+  scope                = azurerm_storage_account.str.id
+  role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azuread_service_principal.sp.object_id
 }
