@@ -31,6 +31,13 @@ module "avm-ptn-alz" {
         }
       }
     }
+    landingzones = {
+      policy_assignments = {
+        Enable-DDoS-VNET = {
+          enforcement_mode = "DoNotEnforce"
+        }
+      }
+    }
   }
 
   policy_default_values = null
