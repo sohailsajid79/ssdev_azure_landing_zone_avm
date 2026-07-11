@@ -1,0 +1,2 @@
+corp_subscription_id = "9f5e4add-5e93-4493-ade9-24875249cf92"
+hub_vnet_id          = "/subscriptions/4f6ba84c-31c8-4b22-b336-98a2a768209a/resourceGroups/rg-ss-dev-connectivity/providers/Microsoft.Network/virtualNetworks/vnet-ss-dev-hub"
