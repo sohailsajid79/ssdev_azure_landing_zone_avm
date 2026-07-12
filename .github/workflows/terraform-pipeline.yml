@@ -1,0 +1,163 @@
+name: terraform
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+env:
+  ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+  ARM_USE_OIDC: "true"
+  ARM_USE_AZUREAD: "true"
+  TF_VERSION: "1.12.2"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform fmt
+        run: terraform fmt -check -recursive -diff
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v6
+        with:
+          tflint_version: v0.55.1
+
+      - name: TFLint
+        run: |
+          tflint --init
+          tflint --recursive --format compact
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Checkov IaC scan
+        run: |
+          pip install checkov==3.2.416
+          checkov -d . --framework terraform --soft-fail --compact --quiet
+
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      layers: ${{ steps.filter.outputs.changes }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            management-groups: 'platform/management-groups/**'
+            subscriptions: 'platform/subscriptions/**'
+            connectivity: 'platform/connectivity/**'
+            management: 'platform/management/**'
+            corp: 'application-landing-zones/corp/**'
+            online: 'application-landing-zones/online/**'
+
+  plan:
+    needs: [lint, detect]
+    if: needs.detect.outputs.layers != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        layer: ${{ fromJSON(needs.detect.outputs.layers) }}
+      fail-fast: false
+    env:
+      WORKDIR: ${{ contains(fromJSON('["corp","online"]'), matrix.layer) && format('application-landing-zones/{0}', matrix.layer) || format('platform/{0}', matrix.layer) }}
+    defaults:
+      run:
+        working-directory: ${{ contains(fromJSON('["corp","online"]'), matrix.layer) && format('application-landing-zones/{0}', matrix.layer) || format('platform/{0}', matrix.layer) }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Terraform init
+        run: terraform init -backend-config=backend.hcl -input=false
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        shell: bash
+        run: terraform plan -input=false -no-color -out=tfplan 2>&1 | tee plan.txt
+
+      - name: Comment plan on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+            const plan = fs.readFileSync(`${process.env.WORKDIR}/plan.txt`, 'utf8');
+            const truncated = plan.length > 60000
+              ? '...(truncated)...\n' + plan.slice(-60000)
+              : plan;
+            const body = [
+              `### Terraform plan — \`${{ matrix.layer }}\``,
+              '<details><summary>Show plan</summary>',
+              '',
+              '```',
+              truncated,
+              '```',
+              '</details>'
+            ].join('\n');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });
+
+  apply:
+    needs: [plan, detect]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: prod
+    
+    strategy:
+      matrix:
+        layer: ${{ fromJSON(needs.detect.outputs.layers) }}
+      fail-fast: false
+    defaults:
+      run:
+        working-directory: ${{ contains(fromJSON('["corp","online"]'), matrix.layer) && format('application-landing-zones/{0}', matrix.layer) || format('platform/{0}', matrix.layer) }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Terraform init
+        run: terraform init -backend-config=backend.hcl -input=false
+
+      - name: Terraform plan
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Terraform apply
+        run: terraform apply -input=false tfplan
