@@ -1,0 +1,2 @@
+online_subscription_id = "ff5ae50e-19ad-4032-99c7-588ae6305dc5"
+hub_vnet_id            = "/subscriptions/4f6ba84c-31c8-4b22-b336-98a2a768209a/resourceGroups/rg-ss-dev-connectivity/providers/Microsoft.Network/virtualNetworks/vnet-ss-dev-hub"
