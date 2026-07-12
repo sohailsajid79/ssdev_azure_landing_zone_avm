@@ -9,3 +9,4 @@ tfplan
 crash.log
 .terraform.lock.hcl
 .alzlib
+.DS_Store
