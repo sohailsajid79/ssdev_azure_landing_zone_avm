@@ -12,9 +12,9 @@ variable "enable_telemetry" {
   default = true
 }
 
-variable "allowed_locations" {
-  type = list(string)
-}
+# variable "allowed_locations" {
+#   type = list(string)
+# }
 
 variable "subscription_id" {
   type = string

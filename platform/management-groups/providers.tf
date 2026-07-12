@@ -25,8 +25,6 @@ terraform {
   }
 }
 
-data "azapi_client_config" "current" {}
-
 provider "alz" {
   library_overwrite_enabled = true
   library_references = [
