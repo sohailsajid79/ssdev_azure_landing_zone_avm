@@ -5,5 +5,7 @@ terraform.tfstate.*
 *.tfstate
 *.tfstate.*
 *.tfplan
+tfplan
+crash.log
 .terraform.lock.hcl
 .alzlib
