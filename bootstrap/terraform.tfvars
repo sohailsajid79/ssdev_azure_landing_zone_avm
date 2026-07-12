@@ -7,4 +7,4 @@ vended_subscription_ids = {
   online       = "ff5ae50e-19ad-4032-99c7-588ae6305dc5"
 }
 github_org  = "sohailsajid79"
-github_repo = "ssdev-azure-landing-zone-avm"
+github_repo = "ssdev_azure_landing_zone_avm"
