@@ -11,6 +11,10 @@ permissions:
   contents: read
   pull-requests: write
 
+concurrency:
+  group: terraform-${{ github.ref }}
+  cancel-in-progress: false
+
 env:
   ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
   ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -31,17 +35,6 @@ jobs:
       - uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: ${{ env.TF_VERSION }}
-
-      - name: Create plugin cache dir
-        run: mkdir -p "$TF_PLUGIN_CACHE_DIR"
-
-      - name: Cache Terraform providers
-        uses: actions/cache@v4
-        with:
-          path: ${{ github.workspace }}/.terraform-plugin-cache
-          key: tf-providers-${{ runner.os }}-${{ hashFiles('**/.terraform.lock.hcl') }}
-          restore-keys: |
-            tf-providers-${{ runner.os }}-
 
       - name: Terraform fmt
         run: terraform fmt -check -recursive -diff
@@ -125,7 +118,7 @@ jobs:
 
       - name: Terraform plan
         shell: bash
-        run: terraform plan -input=false -no-color -out=tfplan 2>&1 | tee plan.txt
+        run: terraform plan -input=false -no-color -refresh=false -lock-timeout=5m -out=tfplan 2>&1 | tee plan.txt
 
       - name: Comment plan on PR
         if: github.event_name == 'pull_request'
@@ -138,7 +131,7 @@ jobs:
               ? '...(truncated)...\n' + plan.slice(-60000)
               : plan;
             const body = [
-              `### Terraform plan — \`${{ matrix.layer }}\``,
+              `### Terraform plan — \`${{ matrix.layer }}\` _(refresh skipped — drift checked at apply)_`,
               '<details><summary>Show plan</summary>',
               '',
               '```',
@@ -189,8 +182,8 @@ jobs:
       - name: Terraform init
         run: terraform init -backend-config=backend.hcl -input=false
 
-      - name: Terraform plan
-        run: terraform plan -input=false -out=tfplan
+      - name: Terraform plan (with refresh)
+        run: terraform plan -input=false -lock-timeout=5m -out=tfplan
 
       - name: Terraform apply
-        run: terraform apply -input=false tfplan
+        run: terraform apply -input=false -lock-timeout=5m tfplan
