@@ -40,5 +40,19 @@ module "avm-ptn-alz" {
     }
   }
 
-  policy_default_values = null
+  policy_default_values = {
+    # Diagnostics
+    log_analytics_workspace_id                  = jsonencode({ value = var.log_analytics_workspace_id })
+    ama_change_tracking_data_collection_rule_id = jsonencode({ value = var.dcr_change_tracking_id })
+    ama_vm_insights_data_collection_rule_id     = jsonencode({ value = var.dcr_vm_insights_id })
+    ama_mdfc_sql_data_collection_rule_id        = jsonencode({ value = var.dcr_defender_sql_id })
+    ama_user_assigned_managed_identity_id       = jsonencode({ value = var.ama_uami_id })
+    ama_user_assigned_managed_identity_name     = jsonencode({ value = var.ama_uami_name })
+
+    private_dns_zone_subscription_id     = jsonencode({ value = var.connectivity_subscription_id })
+    private_dns_zone_resource_group_name = jsonencode({ value = var.dns_zone_resource_group_name })
+    private_dns_zone_region              = jsonencode({ value = var.location })
+
+    email_security_contact = jsonencode({ value = var.security_contact_email })
+  }
 }
