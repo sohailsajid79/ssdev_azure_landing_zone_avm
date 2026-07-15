@@ -8,3 +8,4 @@ vended_subscription_ids = {
 }
 github_org  = "sohailsajid79"
 github_repo = "ssdev_azure_landing_zone_avm"
+grant_tenant_root_owner = true
