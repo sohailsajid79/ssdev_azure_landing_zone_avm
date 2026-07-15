@@ -6,6 +6,6 @@ vended_subscription_ids = {
   management   = "4b967947-aa67-4485-a8a4-7e878d231acc"
   online       = "ff5ae50e-19ad-4032-99c7-588ae6305dc5"
 }
-github_org  = "sohailsajid79"
-github_repo = "ssdev_azure_landing_zone_avm"
+github_org              = "sohailsajid79"
+github_repo             = "ssdev_azure_landing_zone_avm"
 grant_tenant_root_owner = true
