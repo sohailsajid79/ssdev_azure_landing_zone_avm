@@ -131,15 +131,19 @@ Supply-chain posture: after the [March 2026 Trivy supply-chain attack](https://g
 
 Plan on PR, apply on merge to main **behind a `prod` environment gate with a required reviewer** (the workflow holds the merges until I approve them). Path-filtered matrix so only changed layers run. `fmt` -> TFLint (azurerm ruleset) -> Checkov -> validate -> plan (posted as a PR comment) -> gated apply.
 
-Auth is OIDC end to end - **zero stored secrets**:
+![pr-example](assets/pr-example.png)
 
-![Federated credentials](assets/federated-credentials.png)
+![pr-example](assets/pipeline-example.png)
 
 - **PR plans run `-refresh=false`** - skips the state refresh that was getting the SP throttled on management-group reads. The gated apply replans *with* refresh, so drift is caught at the moment before anything ships.
 - **`concurrency` group with `cancel-in-progress: false`** - one run at a time, queued not cancelled, because cancelled Terraform runs orphan state locks.
 - **`-lock-timeout=5m`** on everything that touches state.
 - **Provider caching** - `actions/cache` keyed on `.terraform.lock.hcl` hashes, shared across the matrix.
 - Bootstrap is deliberately excluded from the pipeline.
+
+Auth is OIDC end to end - **zero stored secrets**:
+
+![Federated credentials](assets/federated-credentials.png)
 
 ## The DDoS policy that broke VNet creation
 
