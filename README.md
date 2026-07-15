@@ -61,7 +61,6 @@ subscriptions, each peered bidirectionally to the hub.
 | `vnet-ss-dev-corp` | sub-ss-dev-corp | 10.20.0.0/16 | Corp archetype: internal-facing workloads |
 | `vnet-ss-dev-online` | sub-ss-dev-online | 10.30.0.0/16 | Online archetype: internet-facing workloads (App Gateway subnet pre-staged) |
 
-
 Non-overlapping /16s per network, /24 subnets carved inside, 10.40.x.x reserved
 for future spokes. Corp and Online are classic ALZ archetypes, and the difference is *governance posture*; corp's management group carries the everything-private policies
 (`Deploy-Private-DNS-Zones` lives there), online expects controlled public
@@ -80,7 +79,7 @@ are hand-composed from the same AVM modules the accelerator generates.
 
 ### Repo layout (in deployment order)
 
-1. `bootstrap/` - state storage + pipeline identity (local state)
+1. `bootstrap/` - state storage + pipeline identity (remote state)
 2. `platform/management-groups/` - ALZ hierarchy + policy archetypes
 3. `platform/subscriptions/` - subscription vending + MG placement
 4. `platform/connectivity/` - hub VNet + private DNS zones
